@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { authOperations } from '../redux/auth';
 import { Button } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
@@ -15,67 +15,71 @@ const styles = {
   },
 };
 
-class LoginView extends Component {
-  state = {
-    email: '',
-    password: '',
+const LoginView = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
+
+  const handleChange = evt => {
+    const { name, value } = evt.target;
+
+    switch (name) {
+      case 'email':
+        setEmail(value);
+        break;
+
+      case 'password':
+        setPassword(value);
+        break;
+
+      default:
+        console.warn(`Тип поля name - ${name} не обрабатывается`);
+    }
   };
 
-  handleChange = ({ target: { name, value } }) => {
-    this.setState({ [name]: value });
+  const handleSubmit = evt => {
+    evt.preventDefault();
+    dispatch(authOperations.logIn({ email, password }));
+    setEmail('');
+    setPassword('');
   };
 
-  handleSubmit = e => {
-    e.preventDefault();
+  return (
+    <div>
+      <h1>Please, log in if you already have an account!</h1>
 
-    this.props.onLogin(this.state);
+      <form onSubmit={handleSubmit} style={styles.form} autoComplete="off">
+        <TextField
+          style={styles.label}
+          label="Email"
+          variant="filled"
+          type="email"
+          name="email"
+          value={email}
+          onChange={handleChange}
+        />
 
-    this.setState({ email: '', password: '' });
-  };
+        <TextField
+          style={styles.label}
+          label="Password"
+          variant="filled"
+          type="password"
+          name="password"
+          value={password}
+          onChange={handleChange}
+        />
 
-  render() {
-    const { email, password } = this.state;
-
-    return (
-      <div>
-        <h1>Please, log in if you already have an account!</h1>
-
-        <form
-          onSubmit={this.handleSubmit}
-          style={styles.form}
-          autoComplete="off"
-        >
-          <TextField
-            style={styles.label}
-            label="Email"
-            variant="filled"
-            type="email"
-            name="email"
-            value={email}
-            onChange={this.handleChange}
-          />
-
-          <TextField
-            style={styles.label}
-            label="Password"
-            variant="filled"
-            type="password"
-            name="password"
-            value={password}
-            onChange={this.handleChange}
-          />
-
-          <Button type="submit" variant="contained" color="primary">
-            {' '}
-            Login
-          </Button>
-        </form>
-      </div>
-    );
-  }
-}
-const mapDispatchToProps = {
-  onLogin: authOperations.logIn,
+        <Button type="submit" variant="contained" color="primary">
+          {' '}
+          Login
+        </Button>
+      </form>
+    </div>
+  );
 };
 
-export default connect(null, mapDispatchToProps)(LoginView);
+//   handleChange = ({ target: { name, value } }) => {
+//     this.setState({ [name]: value });
+//   };
+
+export default LoginView;

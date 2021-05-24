@@ -1,39 +1,31 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import operations from '../redux/phonebook/phonebook-operations';
 import Form from '../components/Form';
 import Contacts from '../components/Contacts';
 import Filter from '../components/Filter';
 import * as selectors from '../redux/phonebook/phonebook-selectors';
 
-class ContactsView extends Component {
-  componentDidMount() {
-    this.props.fetchContact();
-  }
+const ContactsView = () => {
+  const dispatch = useDispatch();
+  const isLoading = useSelector(selectors.getLoading);
+  const isError = useSelector(selectors.getError);
 
-  render() {
-    return (
-      <div className="containerApp">
-        <h1>Phonebook</h1>
-        <Form />
-        <h2>Contacts</h2>
-        <Filter />
-        <Contacts />
-        {this.props.isLoading && <h2>Loading ... </h2>}
-        {this.props.isError && <h2>Something goes wrong :( </h2>}
-      </div>
-    );
-  }
-}
+  useEffect(() => {
+    dispatch(operations.fetchContact());
+  }, [dispatch]);
 
-const mapStateToProps = state => ({
-  isLoading: selectors.getLoading(state),
-  isError: selectors.getError(state),
-});
+  return (
+    <div className="containerApp">
+      <h1>Phonebook</h1>
+      <Form />
+      <h2>Contacts</h2>
+      <Filter />
+      <Contacts />
+      {isLoading && <h2>Loading ... </h2>}
+      {isError && <h2>Something goes wrong :( </h2>}
+    </div>
+  );
+};
 
-const mapDispatchToProps = dispatch => ({
-  fetchContact: () => dispatch(operations.fetchContact()),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(ContactsView);
+export default ContactsView;

@@ -1,10 +1,10 @@
-import React, { Component, Suspense, lazy } from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import React, { useEffect, Suspense, lazy } from 'react';
+import { Switch, Redirect } from 'react-router-dom';
 import AppBar from '@material-ui/core/AppBar';
 import Bar from './components/Bar';
 import Container from './components/Container';
 import { authOperations } from './redux/auth';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
@@ -14,47 +14,43 @@ const RegisterView = lazy(() => import('./views/RegisterView'));
 const LoginView = lazy(() => import('./views/LoginView'));
 const ContactsView = lazy(() => import('./views/ContactsView'));
 
-class App extends Component {
-  componentDidMount() {
-    this.props.onGetCurretnUser();
-  }
+const App = () => {
+  const dispatch = useDispatch();
 
-  render() {
-    return (
-      <Container>
-        <AppBar>
-          <Bar />
-        </AppBar>
-        <Suspense fallback={<p>Loading...</p>}>
-          <Switch>
-            <Route exact path="/" component={HomeView} />
-            <PublicRoute
-              path="/register"
-              restricted
-              redirectTo="/contacts"
-              component={RegisterView}
-            />
-            <PublicRoute
-              path="/login"
-              restricted
-              redirectTo="/contacts"
-              component={LoginView}
-            />
-            <PrivateRoute
-              path="/contacts"
-              component={ContactsView}
-              redirectTo="/login"
-            />
-            <Redirect to="/" />
-          </Switch>
-        </Suspense>
-      </Container>
-    );
-  }
-}
+  useEffect(() => {
+    dispatch(authOperations.getCurrentUser());
+  }, [dispatch]);
 
-const mapDispatchToProps = {
-  onGetCurretnUser: authOperations.getCurrentUser,
+  return (
+    <Container>
+      <AppBar>
+        <Bar />
+      </AppBar>
+      <Suspense fallback={<p>Loading...</p>}>
+        <Switch>
+          <PublicRoute exact path="/">
+            <HomeView />
+          </PublicRoute>
+
+          <PublicRoute path="/register" restricted redirectTo="/contacts">
+            <RegisterView />
+          </PublicRoute>
+
+          <PublicRoute path="/login" restricted redirectTo="/contacts">
+            {' '}
+            <LoginView />{' '}
+          </PublicRoute>
+
+          <PrivateRoute path="/contacts" redirectTo="/login">
+            {' '}
+            <ContactsView />
+          </PrivateRoute>
+
+          <Redirect to="/" />
+        </Switch>
+      </Suspense>
+    </Container>
+  );
 };
 
-export default connect(null, mapDispatchToProps)(App);
+export default App;

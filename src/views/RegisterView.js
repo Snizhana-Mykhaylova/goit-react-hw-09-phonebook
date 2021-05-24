@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { authOperations } from '../redux/auth';
 import { Button } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
@@ -15,79 +15,69 @@ const styles = {
   },
 };
 
-class RegisterView extends Component {
-  state = {
-    name: '',
-    email: '',
-    password: '',
-  };
-
-  handleChange = ({ target: { name, value } }) => {
-    this.setState({ [name]: value });
-  };
-
-  handleSubmit = e => {
-    e.preventDefault();
-
-    this.props.onRegister(this.state);
-
-    this.setState({ name: '', email: '', password: '' });
-  };
-
-  render() {
-    const { name, email, password } = this.state;
-
-    return (
-      <div>
-        <h1>Please, register to create a new account!</h1>
-
-        <form
-          onSubmit={this.handleSubmit}
-          style={styles.form}
-          autoComplete="off"
-        >
-          <TextField
-            style={styles.label}
-            label="Name"
-            variant="filled"
-            type="text"
-            name="name"
-            value={name}
-            onChange={this.handleChange}
-          />
-
-          <TextField
-            style={styles.label}
-            label="Email"
-            variant="filled"
-            type="email"
-            name="email"
-            value={email}
-            onChange={this.handleChange}
-          />
-
-          <TextField
-            style={styles.label}
-            id="filled-basic"
-            label="Password"
-            variant="filled"
-            type="password"
-            name="password"
-            value={password}
-            onChange={this.handleChange}
-          />
-
-          <Button type="submit" variant="contained" color="primary">
-            Register
-          </Button>
-        </form>
-      </div>
-    );
-  }
-}
-
-const mapDispatchToProps = {
-  onRegister: authOperations.register,
+const initialState = {
+  name: '',
+  email: '',
+  password: '',
 };
 
-export default connect(null, mapDispatchToProps)(RegisterView);
+const RegisterView = () => {
+  const [state, setState] = useState(initialState);
+  const { name, email, password } = state;
+  const dispatch = useDispatch();
+
+  const handleChange = ({ target: { name, value } }) => {
+    setState({ ...state, [name]: value });
+  };
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    dispatch(authOperations.register(state));
+    setState(initialState);
+  };
+
+  return (
+    <div>
+      <h1>Please, register to create a new account!</h1>
+
+      <form onSubmit={handleSubmit} style={styles.form} autoComplete="off">
+        <TextField
+          style={styles.label}
+          label="Name"
+          variant="filled"
+          type="text"
+          name="name"
+          value={name}
+          onChange={handleChange}
+        />
+
+        <TextField
+          style={styles.label}
+          label="Email"
+          variant="filled"
+          type="email"
+          name="email"
+          value={email}
+          onChange={handleChange}
+        />
+
+        <TextField
+          style={styles.label}
+          id="filled-basic"
+          label="Password"
+          variant="filled"
+          type="password"
+          name="password"
+          value={password}
+          onChange={handleChange}
+        />
+
+        <Button type="submit" variant="contained" color="primary">
+          Register
+        </Button>
+      </form>
+    </div>
+  );
+};
+
+export default RegisterView;

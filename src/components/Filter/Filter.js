@@ -1,7 +1,7 @@
-import { connect } from 'react-redux';
+import { useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import * as actions from '../../redux/phonebook/phonebook-actions';
 import * as selectors from '../../redux/phonebook/phonebook-selectors';
-import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 
 const styles = {
@@ -13,29 +13,24 @@ const styles = {
   },
 };
 
-const Filter = ({ value, onChange }) => (
-  <TextField
-    style={styles.input}
-    label="Find contacts by name"
-    variant="filled"
-    type="text"
-    value={value}
-    onChange={onChange}
-  />
-);
-const mapStateToProps = state => ({ value: selectors.getFilter(state) });
+const Filter = () => {
+  const value = useSelector(selectors.getFilter);
+  const dispatch = useDispatch();
+  const onChange = useCallback(
+    event => dispatch(actions.filterChange(event.target.value)),
+    [dispatch],
+  );
 
-const mapDispatchToProps = dispatch => ({
-  onChange: event => dispatch(actions.filterChange(event.target.value)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Filter);
-
-Filter.defaultProps = {
-  value: '',
+  return (
+    <TextField
+      style={styles.input}
+      label="Find contacts by name"
+      variant="filled"
+      type="text"
+      value={value}
+      onChange={onChange}
+    />
+  );
 };
 
-Filter.propTypes = {
-  value: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
-};
+export default Filter;
