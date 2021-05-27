@@ -32,16 +32,16 @@ const loading = createReducer(false, {
   [fetchContactError]: () => false,
 });
 
-const error = createReducer(false, {
-  [addContactRequest]: () => false,
-  [addContactSuccess]: () => false,
-  [addContactError]: () => true,
-  [deleteContactRequest]: () => false,
-  [deleteContactSuccess]: () => false,
-  [deleteContactError]: () => true,
-  [fetchContactRequest]: () => false,
-  [fetchContactSuccess]: () => false,
-  [fetchContactError]: () => true,
+const error = createReducer(null, {
+  [addContactRequest]: (state, { payload }) => null,
+  [addContactSuccess]: (state, { payload }) => null,
+  [addContactError]: (state, { payload }) => payload,
+  [deleteContactRequest]: (state, { payload }) => null,
+  [deleteContactSuccess]: (state, { payload }) => null,
+  [deleteContactError]: (state, { payload }) => payload,
+  [fetchContactRequest]: (state, { payload }) => null,
+  [fetchContactSuccess]: (state, { payload }) => null,
+  [fetchContactError]: (state, { payload }) => payload,
 });
 
 const filterReducer = createReducer('', {
